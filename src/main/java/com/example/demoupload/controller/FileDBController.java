@@ -27,44 +27,35 @@ public class FileDBController {
     private FileDBService fileDBService;
 
     @PostMapping("/upload")
-    public ResponseEntity<MessageResponse> uploadFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<MessageResponse> uploadFile(@RequestParam("file1") MultipartFile file1,@RequestParam("file2") MultipartFile file2) {
         String message = "";
         try {
-            fileDBService.store(file);
+            fileDBService.store(file1, file2);
 
-            message = "Uploaded the file successfully: " + file.getOriginalFilename();
+            message = "Uploaded the file successfully: " + file1.getOriginalFilename();
             return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse(message));
         } catch (Exception e) {
-            message = "Could not upload the file: " + file.getOriginalFilename() + "!";
+            message = "Could not upload the file: " + file1.getOriginalFilename() + "!";
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new MessageResponse(message));
         }
     }
 
-    @GetMapping("/files")
-    public ResponseEntity<List<FileDBResponse>> getListFiles() {
-        List<FileDBResponse> files = fileDBService.getAllFiles().map(dbFile -> {
-            String fileDownloadUri = ServletUriComponentsBuilder
-                    .fromCurrentContextPath()
-                    .path("/api/auth/files/")
-                    .path(dbFile.getId().toString())
-                    .toUriString();
 
-            return new FileDBResponse(
-                    dbFile.getName(),
-                    fileDownloadUri,
-                    dbFile.getType(),
-                    dbFile.getData().length);
-        }).collect(Collectors.toList());
 
-        return ResponseEntity.status(HttpStatus.OK).body(files);
-    }
-
-    @GetMapping("/files/{id}")
-    public ResponseEntity<byte[]> getFile(@PathVariable String id) {
+    @GetMapping("/files/get1/{id}")
+    public ResponseEntity<byte[]> getFile1(@PathVariable long id) {
         Optional<FileDB> optionalFileDB = fileDBRepository.findById(id);
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + optionalFileDB.get().getName() + "\"")
-                .body(optionalFileDB.get().getData());
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + optionalFileDB.get().getName1() + "\"")
+                .body(optionalFileDB.get().getData1());
+    }
+    @GetMapping("/files/get2/{id}")
+    public ResponseEntity<byte[]> getFile2(@PathVariable long id) {
+        Optional<FileDB> optionalFileDB = fileDBRepository.findById(id);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + optionalFileDB.get().getName2() + "\"")
+                .body(optionalFileDB.get().getData2());
     }
 }

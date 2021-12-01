@@ -17,9 +17,10 @@ public class FileDBServiceImpl implements FileDBService{
     private FileDBRepository fileDBRepository;
 
     @Override
-    public FileDB store(MultipartFile file) throws IOException {
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-        FileDB image = new FileDB(fileName, file.getContentType(), file.getBytes());
+    public FileDB store(MultipartFile file1,MultipartFile file2) throws IOException {
+        String fileName1 = StringUtils.cleanPath(file1.getOriginalFilename());
+        String fileName2 = StringUtils.cleanPath(file2.getOriginalFilename());
+        FileDB image = new FileDB(fileName1,fileName2, file1.getContentType(),file2.getContentType(), file1.getBytes(), file2.getBytes());
 
         return fileDBRepository.save(image);
     }
